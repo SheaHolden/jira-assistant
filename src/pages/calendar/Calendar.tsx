@@ -250,7 +250,7 @@ export default function Calendar({
 
     const handleDateClick = useCallback(
         (date: Date, event: React.MouseEvent) => {
-            if (currentViewMode !== monthViewMode) {
+            if (currentViewMode !== monthViewMode || !settings.monthClickAddsWorklog) {
                 return;
             }
 
@@ -262,7 +262,7 @@ export default function Calendar({
 
             handleEntryCreate({ start: date, end: addMinutes(date, defaultEntryDurationMinutes), allDay: true, view: monthViewMode });
         },
-        [currentViewMode, handleEntryCreate],
+        [currentViewMode, settings.monthClickAddsWorklog, handleEntryCreate],
     );
 
     const handleEntryClick = useCallback(
@@ -524,6 +524,7 @@ export default function Calendar({
 
     const calendarClasses = classNames('calendar-view', {
         'cal-row-banding': settings.rowBanding,
+        'cal-daily-total-text': settings.dailyTotalAsText,
     });
 
     return (
@@ -539,7 +540,7 @@ export default function Calendar({
                     selectable
                     creatable
                     nowIndicator
-                    navLinks={currentViewMode !== monthViewMode}
+                    navLinks={currentViewMode !== monthViewMode || !settings.monthClickAddsWorklog}
                     showNavigationPicker={!isGadget}
                     navigationPickerIconOnly
                     hideToolbar={useEmbeddedHeader}

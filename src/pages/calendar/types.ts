@@ -15,6 +15,8 @@ export interface CalendarSettings {
     rowBanding?: boolean;
     hideWeekends?: boolean;
     readableEvents?: boolean;
+    monthClickAddsWorklog?: boolean;
+    dailyTotalAsText?: boolean;
     detailsMode?: '1' | '2' | '3';
 }
 

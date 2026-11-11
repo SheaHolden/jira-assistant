@@ -216,6 +216,36 @@ export default function CalendarSettings({ settings: initialSettings, onDone, on
                             </label>
                         </div>
                     </section>
+
+                    <section className="lg:col-span-2">
+                        {sectionHeader('fa-calendar', 'Month View')}
+                        <div className="rounded-xl overflow-hidden border grid grid-cols-1 md:grid-cols-2" style={borderStyle}>
+                            <label className="flex items-start gap-3 px-4 py-3 bg-(--bg-primary) hover:bg-(--bg-secondary) transition-colors cursor-pointer md:border-r" style={{ borderColor: 'var(--border-primary)' }}>
+                                <Checkbox
+                                    checked={settings.monthClickAddsWorklog || false}
+                                    onChange={(val) => setValue(val.value, 'monthClickAddsWorklog')}
+                                />
+                                <div>
+                                    <span className="text-sm font-medium text-(--text-primary)">Click a day to add worklog</span>
+                                    <p className="text-xs text-(--text-secondary) mt-0.5">
+                                        Clicking a day opens Add Worklog. Click the day number to open the day view.
+                                    </p>
+                                </div>
+                            </label>
+                            <label className="flex items-start gap-3 px-4 py-3 bg-(--bg-primary) hover:bg-(--bg-secondary) transition-colors cursor-pointer border-t md:border-t-0" style={{ borderColor: 'var(--border-primary)' }}>
+                                <Checkbox
+                                    checked={settings.dailyTotalAsText || false}
+                                    onChange={(val) => setValue(val.value, 'dailyTotalAsText')}
+                                />
+                                <div>
+                                    <span className="text-sm font-medium text-(--text-primary)">Daily summary as text</span>
+                                    <p className="text-xs text-(--text-secondary) mt-0.5">
+                                        Show the daily total as text next to the day number instead of an entry
+                                    </p>
+                                </div>
+                            </label>
+                        </div>
+                    </section>
                 </div>
 
                 {/* Footer actions */}
