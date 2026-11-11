@@ -240,24 +240,30 @@ export function useWorklogOperations(setEvents: SetEvents, settings: any, curren
         [$worklog, $message, $analytics],
     );
 
+    const removeWorklog = useCallback(
+        (worklog: Worklog) => {
+            const worklogId = worklog.id + (worklog.worklogId ? `#${worklog.worklogId}` : '');
+
+            setEvents((prev) => {
+                const updated = prev.filter((e) => !(e.id === worklogId && e.data.entryType === 1));
+                return getUpdatedAllDayEvents(new Date(worklog.dateStarted), updated, settings, currentUser);
+            });
+        },
+        [setEvents, settings, currentUser],
+    );
+
     const deleteWorklog = useCallback(
         async (worklog: Worklog) => {
             try {
                 await $worklog.deleteWorklog(worklog);
-                const worklogId = worklog.id + (worklog.worklogId ? `#${worklog.worklogId}` : '');
-
-                setEvents((prev) => {
-                    let updated = prev.filter((e) => !(e.id === worklogId && e.data.entryType === 1));
-                    updated = getUpdatedAllDayEvents(new Date(worklog.dateStarted), updated, settings, currentUser);
-                    return updated;
-                });
+                removeWorklog(worklog);
                 $analytics.trackEvent('Worklog deleted', 'User actions', worklog.isUploaded ? 'Uploaded worklog' : 'Pending worklog');
             } catch (error) {
                 console.error('Error deleting worklog:', error);
                 $message.error('Failed to delete worklog');
             }
         },
-        [setEvents, settings, currentUser, $worklog, $message, $analytics],
+        [removeWorklog, $worklog, $message, $analytics],
     );
 
     const cloneWorklog = useCallback(
@@ -316,6 +322,7 @@ export function useWorklogOperations(setEvents: SetEvents, settings: any, curren
         uploadWorklog,
         uploadAllWorklogs,
         deleteWorklog,
+        removeWorklog,
         cloneWorklog,
         addWorklog,
         editWorklog,

@@ -97,6 +97,7 @@ export default function Calendar({
         uploadWorklog,
         uploadAllWorklogs,
         deleteWorklog,
+        removeWorklog,
         cloneWorklog,
         addWorklog,
         editWorklog,
@@ -375,9 +376,7 @@ export default function Calendar({
             }
 
             if (result.removed) {
-                const worklog = result.deletedObj as Worklog;
-                const worklogId = worklog.id + (worklog.worklogId ? `#${worklog.worklogId}` : '');
-                setEvents((prev) => prev.filter((e) => !(e.id === worklogId && e.data.entryType === 1)));
+                removeWorklog(result.deletedObj as Worklog);
                 onWorklogChange?.(GadgetActionType.DeletedWorklog);
             } else if (result.added) {
                 addWorklog(result.added);
@@ -389,7 +388,7 @@ export default function Calendar({
 
             setShowAddWorklogPopup(false);
         },
-        [setEvents, addWorklog, editWorklog, onWorklogChange],
+        [removeWorklog, addWorklog, editWorklog, onWorklogChange],
     );
 
     const handleUploadAll = useCallback(async () => {
