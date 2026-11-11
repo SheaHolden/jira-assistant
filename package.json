@@ -15,6 +15,7 @@
     "license": "MIT",
     "scripts": {
         "start": "cross-env VITE_BUILD_MODE=WEB vite --host --force",
+        "start-web": "cross-env VITE_BUILD_MODE=WEB PORT=47613 vite --no-open",
         "start-extn": "cross-env VITE_BUILD_MODE=EXTN vite",
         "start-app": "concurrently -k npm:app:*",
         "build": "cross-env-shell VITE_BUILD_MODE=EXTN GENERATE_SOURCEMAP=false INLINE_RUNTIME_CHUNK=false \"tsc -b && vite build\"",

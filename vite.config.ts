@@ -10,6 +10,8 @@ import mkcert from 'vite-plugin-mkcert';
 import svgr from 'vite-plugin-svgr';
 import webfontDownload from 'vite-plugin-webfont-dl';
 
+import { devCorsProxyHostSuffix, devCorsProxyPath } from './src/constants/dev-proxy';
+
 const isProdMode = process.env.NODE_ENV === 'production';
 // Set JA_DEBUG_BUILD=1 to produce an unminified build (readable variable names in the
 // background service worker and content scripts). Sourcemaps aren't used since they don't
@@ -304,6 +306,63 @@ function pokerSource(): Plugin {
     };
 }
 
+const proxyDroppedRequestHeaders = ['host', 'origin', 'referer', 'cookie', 'connection', 'content-length', 'accept-encoding'];
+const proxyDroppedResponseHeaders = ['content-encoding', 'content-length', 'transfer-encoding', 'connection', 'set-cookie'];
+
+// Jira Cloud sends no CORS headers, so the dev web app reaches it through this server-side relay.
+function devCorsProxy(): Plugin {
+    return {
+        name: 'dev-cors-proxy',
+        apply: 'serve',
+        configureServer(server) {
+            server.middlewares.use(devCorsProxyPath, async (req, res) => {
+                const target = new URL(req.url || '', 'http://localhost').searchParams.get('url');
+                const targetUrl = target && URL.canParse(target) ? new URL(target) : null;
+                if (!targetUrl || targetUrl.protocol !== 'https:') {
+                    res.statusCode = 400;
+                    res.end('Missing or invalid "url" query parameter');
+                    return;
+                }
+                if (!targetUrl.hostname.endsWith(devCorsProxyHostSuffix)) {
+                    res.statusCode = 403;
+                    res.end(`Only ${devCorsProxyHostSuffix} targets are allowed`);
+                    return;
+                }
+
+                const headers = new Headers();
+                for (const [name, value] of Object.entries(req.headers)) {
+                    if (value === undefined || name.startsWith('sec-') || proxyDroppedRequestHeaders.includes(name)) continue;
+                    headers.set(name, Array.isArray(value) ? value.join(', ') : value);
+                }
+
+                try {
+                    const chunks: Buffer[] = [];
+                    for await (const chunk of req) chunks.push(chunk as Buffer);
+                    const hasBody = req.method !== 'GET' && req.method !== 'HEAD' && chunks.length > 0;
+
+                    const upstream = await fetch(targetUrl, {
+                        method: req.method,
+                        headers,
+                        body: hasBody ? Buffer.concat(chunks) : undefined,
+                        redirect: 'follow',
+                    });
+
+                    res.statusCode = upstream.status;
+                    upstream.headers.forEach((value, name) => {
+                        if (!proxyDroppedResponseHeaders.includes(name)) res.setHeader(name, value);
+                    });
+                    res.end(Buffer.from(await upstream.arrayBuffer()));
+                } catch (err: any) {
+                    server.config.logger.error(`[dev-cors-proxy] ${req.method} ${target} failed: ${err.message}`);
+                    res.statusCode = 502;
+                    res.end(err.message);
+                }
+            });
+        },
+    };
+}
+
+const isWebBuild = buildMode === 'WEB';
 const isPluginBuild = buildMode === 'PLUGIN';
 const isAppBuild = buildMode === 'APP';
 
@@ -320,6 +379,7 @@ export default defineConfig(({ command }) => ({
         }),
         fluxoUiSource({ sourcePath: '../../fluxo-ui/src' }),
         pokerSource(),
+        isWebBuild && devCorsProxy(),
         buildVariantPlugin(),
         react(),
         tailwindcss(),
