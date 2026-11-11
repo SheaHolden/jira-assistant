@@ -12,6 +12,8 @@ const initialData = {
     reportUserGrp: '1', // 1=no grouping, 2=group users by project, 3=issuetype, 4=epic
     dateRange: {} as any, // user selected date range
     logFormat: '2', // worklog display format
+    hourDecimals: '4', // decimal places when logFormat is numeric
+    leadingTotalColumn: false, // repeat total column after user details in grouped report
     breakupMode: '1', // combine individual worklogs or not
     userDisplayFormat: '1', // User details display format
     fields: {} as any, // additional fields to be displayed in report
@@ -65,6 +67,8 @@ export function getSettingsObj(data: any, opts?: any) {
         reportUserGrp,
         dateRange,
         logFormat,
+        hourDecimals,
+        leadingTotalColumn,
         breakupMode,
         timeZone,
         sprintStartRounding,
@@ -94,6 +98,8 @@ export function getSettingsObj(data: any, opts?: any) {
         reportUserGrp,
         dateRange,
         logFormat,
+        hourDecimals,
+        leadingTotalColumn,
         breakupMode,
         timeZone,
         sprintStartRounding,

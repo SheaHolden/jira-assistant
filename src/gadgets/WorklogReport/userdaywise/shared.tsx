@@ -2,6 +2,8 @@ import { Image, Link } from '../../../controls';
 import { useWorklogStore } from '../datastore';
 import TicketEstimate from '../TicketEstimate';
 
+import { useConvertSecs } from './useReportUtils';
+
 interface WeeksListProps {
     sprint?: any;
 }
@@ -180,4 +182,26 @@ export function IssueInfo({ issue: t, showParentSummary, hideEstimate, convertSe
             {!hideEstimate && !!(oe || re || logged) && <TicketEstimate est={oe} rem={re} logged={logged} variance={variance} />}
         </td>
     );
+}
+
+interface LeadingTotalCellProps {
+    hours?: number;
+    cost?: number;
+    costView?: boolean;
+    timeExportFormat?: string;
+}
+
+export function LeadingTotalCell({ hours, cost, costView, timeExportFormat }: LeadingTotalCellProps) {
+    const { leadingTotalColumn } = useWorklogStore();
+    const convertSecs = useConvertSecs();
+
+    if (!leadingTotalColumn) {
+        return null;
+    }
+
+    if (costView) {
+        return <td data-export-type="float">{cost}</td>;
+    }
+
+    return <td data-export-type={timeExportFormat}>{convertSecs(hours as number)}</td>;
 }

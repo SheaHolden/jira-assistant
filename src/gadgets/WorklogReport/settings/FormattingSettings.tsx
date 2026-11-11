@@ -10,7 +10,7 @@ interface FormattingSettingsProps {
 }
 
 function FormattingSettings({ setValue, state }: FormattingSettingsProps) {
-    const { logFormat, timeZone, daysToHide } = state;
+    const { logFormat, hourDecimals, timeZone, daysToHide } = state;
     const [showMore, setShowMore] = useState(false);
 
     return (
@@ -49,6 +49,20 @@ function FormattingSettings({ setValue, state }: FormattingSettingsProps) {
                     { value: '2', label: 'Show as number (2.5)' },
                 ]}
             />
+
+            {logFormat === '2' && (
+                <RadioGroup
+                    label="Decimal places"
+                    field="hourDecimals"
+                    value={hourDecimals}
+                    setValue={setValue}
+                    options={[
+                        { value: '1', label: '1 (2.3)' },
+                        { value: '2', label: '2 (2.33)' },
+                        { value: '4', label: '4 (2.3333)' },
+                    ]}
+                />
+            )}
 
             <ShowMoreLink showMore={showMore} setShowMore={setShowMore} />
             {showMore && <MoreFormattingSettings setValue={setValue} state={state} />}
@@ -89,7 +103,7 @@ function RadioGroup({ label, field, value, setValue, options }: RadioGroupProps)
 }
 
 function MoreFormattingSettings({ setValue, state }: { setValue: (key: string, value: any) => void; state: any }) {
-    const { breakupMode, userDisplayFormat, rIndicator, expandUsers, splitWorklogDays } = state;
+    const { breakupMode, userDisplayFormat, rIndicator, expandUsers, leadingTotalColumn, splitWorklogDays } = state;
 
     return (
         <div className="space-y-6">
@@ -132,6 +146,11 @@ function MoreFormattingSettings({ setValue, state }: { setValue: (key: string, v
                     checked={expandUsers}
                     onChange={(e) => setValue('expandUsers', e.value)}
                     label="Expand user row by default in grouped report"
+                />
+                <Checkbox
+                    checked={leadingTotalColumn}
+                    onChange={(e) => setValue('leadingTotalColumn', e.value)}
+                    label="Show total column after user details in grouped report"
                 />
                 <div className="flex items-center gap-2">
                     <Checkbox

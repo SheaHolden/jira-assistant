@@ -4,6 +4,7 @@ import { TBody } from '../../../components/shared';
 import { useWorklogStore } from '../datastore';
 
 import GroupRow from './GroupRow';
+import { LeadingTotalCell } from './shared';
 import { useConvertSecs } from './useReportUtils';
 
 interface GroupBodyProps {
@@ -46,6 +47,12 @@ export default function GroupBody({ boardId, additionalCols, costView }: GroupBo
                     <td colSpan={addlColCount}>
                         Grand Total <i className="fa fa-arrow-right" />
                     </td>
+                    <LeadingTotalCell
+                        hours={isSprint ? sumOf(groupedData, 'grandTotalHours') : groupedData.grandTotal}
+                        cost={isSprint ? sumOf(groupedData, 'grandTotalCost') : groupedData.grandTotalCost}
+                        costView={costView}
+                        timeExportFormat={timeExportFormat}
+                    />
                     {isSprint &&
                         sprintsList?.map(({ id }: any) => (
                             <GroupTotalCells key={id} sprintId={id} timeExportFormat={timeExportFormat} costView={costView} />
@@ -55,6 +62,10 @@ export default function GroupBody({ boardId, additionalCols, costView }: GroupBo
             )}
         </TBody>
     );
+}
+
+function sumOf(groups: any[], prop: string): number {
+    return groups.reduce((sum, grp) => sum + (grp[prop] || 0), 0);
 }
 
 interface GroupTotalCellsProps {

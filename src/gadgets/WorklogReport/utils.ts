@@ -1,5 +1,15 @@
 import { inject } from '../../services/injector';
 
+export function convertReportSecs(val: number, logFormat?: string, hourDecimals?: string): number | string {
+    if (!val && val !== 0) {
+        return val;
+    }
+
+    const { $utils } = inject('UtilsService');
+    const converted = $utils.convertSecs(val, { format: logFormat === '1' });
+    return typeof converted === 'number' ? parseFloat(converted.toFixed(Number(hourDecimals || 4))) : converted;
+}
+
 function stringifyComment(comment: any): string {
     if (!comment) return '';
     if (typeof comment === 'string') return comment;

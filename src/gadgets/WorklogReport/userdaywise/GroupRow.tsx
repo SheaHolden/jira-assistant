@@ -2,6 +2,7 @@ import React, { Fragment, useState, useCallback } from 'react';
 
 import { useWorklogStore } from '../datastore';
 
+import { LeadingTotalCell } from './shared';
 import { useConvertSecs } from './useReportUtils';
 import UserRow from './UserRow';
 
@@ -19,12 +20,13 @@ export default function GroupRow({ group: grp, index, boardId, costView, timeExp
     const toggleDisplay = useCallback(() => setVisibility((h) => !h), []);
 
     const state = useWorklogStore();
-    const { timeframeType } = state;
+    const { timeframeType, leadingTotalColumn } = state;
     const isSprint = timeframeType === '1';
     const sprintsList = isSprint ? state[`sprintsList_${boardId}`] : undefined;
     const dates = isSprint ? undefined : state.groupReport?.dates;
 
     const colSpan = (additionalCols?.length || 0) + 1;
+    const groupNameColSpan = colSpan + (leadingTotalColumn ? 1 : 0);
 
     const convertSecs = useConvertSecs();
 
@@ -32,7 +34,7 @@ export default function GroupRow({ group: grp, index, boardId, costView, timeExp
         <>
             {!hidden && !grp.isDummy && (
                 <tr className="grouped-row left" title="Click to hide user details">
-                    <td colSpan={isSprint ? colSpan : (dates?.length || 0) + 1 + colSpan} onClick={toggleDisplay}>
+                    <td colSpan={isSprint ? groupNameColSpan : (dates?.length || 0) + 1 + groupNameColSpan} onClick={toggleDisplay}>
                         <i className="float-start drill-down fa fa-chevron-circle-down" />
                         {grp.name}
                     </td>
@@ -87,6 +89,12 @@ export default function GroupRow({ group: grp, index, boardId, costView, timeExp
                             </div>
                         )}
                     </td>
+                    <LeadingTotalCell
+                        hours={isSprint ? grp.grandTotalHours : grp.grandTotal}
+                        cost={grp.grandTotalCost}
+                        costView={costView}
+                        timeExportFormat={timeExportFormat}
+                    />
                     {isSprint &&
                         sprintsList?.map(({ id }: any) => (
                             <DayWiseCells

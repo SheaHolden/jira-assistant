@@ -4,6 +4,7 @@ import Indicator from '../../../components/worklog-indicator';
 import { addWorklog } from '../actions';
 import { useWorklogStore, useWorklogDispatch } from '../datastore';
 
+import { LeadingTotalCell } from './shared';
 import TicketRow from './TicketRow';
 import { useConvertSecs, useFormatTime } from './useReportUtils';
 
@@ -83,6 +84,12 @@ export default function UserRow({ groupIndex, user: u, colSpan, additionalCols, 
                         )}
                     </div>
                 </td>
+                <LeadingTotalCell
+                    hours={isSprint ? u.allSprintTotalHours : u.grandTotal}
+                    cost={isSprint ? u.allSprintTotalCost : u.grandTotalCost}
+                    costView={costView}
+                    timeExportFormat={timeExportFormat}
+                />
 
                 {isSprint &&
                     sprintsList?.map(({ id }: any) => (

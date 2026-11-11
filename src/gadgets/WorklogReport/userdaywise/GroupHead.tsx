@@ -13,11 +13,12 @@ interface GroupHeadProps {
 
 export default function GroupHead({ additionalCols, boardId, costView }: GroupHeadProps) {
     const state = useWorklogStore();
-    const { timeframeType } = state;
+    const { timeframeType, leadingTotalColumn } = state;
 
     const useSprint = timeframeType === '1';
     const sprintsList = useSprint ? state[`sprintsList_${boardId}`] : undefined;
     const addlColCount = (additionalCols?.length || 0) + 1;
+    const totalLabel = costView ? 'Total Cost' : 'Total Hours';
 
     return (
         <THead>
@@ -25,6 +26,11 @@ export default function GroupHead({ additionalCols, boardId, costView }: GroupHe
                 <th style={{ minWidth: 260 + addlColCount * 120 }} rowSpan={addlColCount > 1 ? 1 : 2} colSpan={addlColCount}>
                     User Details
                 </th>
+                {leadingTotalColumn && (
+                    <th style={{ minWidth: 50, maxWidth: 100 }} rowSpan={2}>
+                        {totalLabel}
+                    </th>
+                )}
                 {useSprint &&
                     sprintsList?.map((s: any) => (
                         <Fragment key={s.id}>
@@ -33,8 +39,9 @@ export default function GroupHead({ additionalCols, boardId, costView }: GroupHe
                         </Fragment>
                     ))}
                 {!useSprint && <WeeksList />}
-                {!costView && <th style={{ minWidth: 50, maxWidth: 100 }} rowSpan={2}>Total Hours</th>}
-                {costView && <th style={{ minWidth: 50, maxWidth: 100 }} rowSpan={2}>Total Cost</th>}
+                <th style={{ minWidth: 50, maxWidth: 100 }} rowSpan={2}>
+                    {totalLabel}
+                </th>
             </tr>
             <tr className="pad-min auto-wrap">
                 {addlColCount > 1 && <th style={{ minWidth: 380 }}>Issue details</th>}

@@ -6,6 +6,7 @@ import { inject } from '../../services/injector';
 import { getSettingsObj, getSprintsList } from './datastore';
 import { generateRangeReport } from './range-report';
 import { generateSprintReport } from './sprint-report';
+import { convertReportSecs } from './utils';
 
 export function setStateValue(setState: any) {
     return function (value: any) {
@@ -85,15 +86,7 @@ export function fetchData(setState: any, getState: any) {
 }
 
 export function convertSecs(_: any, getState: any) {
-    const { $utils } = inject('UtilsService');
-
-    return (val: number) => {
-        if (!val && val !== 0) {
-            return val;
-        }
-
-        return $utils.convertSecs(val, { format: getState('logFormat') === '1' });
-    };
+    return (val: number) => convertReportSecs(val, getState('logFormat'), getState('hourDecimals'));
 }
 
 export function flatGridSettingsChanged(setState: any) {

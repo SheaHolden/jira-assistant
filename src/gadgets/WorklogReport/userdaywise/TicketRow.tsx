@@ -2,7 +2,7 @@ import React from 'react';
 
 import { useWorklogStore } from '../datastore';
 
-import { IssueDays, IssueInfo } from './shared';
+import { IssueDays, IssueInfo, LeadingTotalCell } from './shared';
 
 interface TicketRowProps {
     isSprint: boolean;
@@ -43,6 +43,12 @@ export default function TicketRow({
             {additionalCols?.map(({ key, Component, props }: any) =>
                 Component ? <Component key={key} value={t.fields?.[key]} {...props} /> : <td key={key}>{t.fields?.[key]}</td>,
             )}
+            <LeadingTotalCell
+                hours={isSprint ? t.allSprintTotalHours : t.totalHours}
+                cost={isSprint ? t.allSprintTotalCost : t.totalCost}
+                costView={costView}
+                timeExportFormat={timeExportFormat}
+            />
 
             {isSprint &&
                 sprintsList?.map(({ id }: any) => (
