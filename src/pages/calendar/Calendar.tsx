@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 
 import classNames from 'classnames';
+import { addMinutes, format } from 'date-fns';
 import type {
     CalendarApi,
     CalendarViewMode,
@@ -34,6 +35,10 @@ import CalendarToolbar from './CalendarToolbar';
 import { useCalendarContextMenu, useCalendarData, useMeetingDetails, useWorklogOperations } from './hooks';
 import MeetingDetails from './MeetingDetails';
 import type { CalendarEntryData, CalendarEvent, CalendarSettings } from './types';
+
+const monthViewMode = 'dayGridMonth';
+const monthCellDayNumberSelector = '.eui-cal-month-cell-day';
+const defaultEntryDurationMinutes = 60;
 
 interface CalendarProps {
     isGadget?: boolean;
@@ -218,7 +223,7 @@ export default function Calendar({
     // Entry creation handler (user drags on empty time slot or double-clicks)
     const handleEntryCreate = useCallback(
         (info: EntryCreateInfo) => {
-            const isMonthMode = info.view === 'dayGridMonth' && !isGadget;
+            const isMonthMode = info.view === monthViewMode && !isGadget;
 
             if (!isMonthMode && info.allDay) {
                 return;
@@ -233,7 +238,7 @@ export default function Calendar({
             const worklogObj: Partial<Worklog> = {
                 timeSpent: `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`,
                 dateStarted: isMonthMode
-                    ? new Date(`${info.start.toISOString().split('T')[0]} ${currentUser.startOfDay || DefaultStartOfDay}`)
+                    ? new Date(`${format(info.start, 'yyyy-MM-dd')} ${currentUser.startOfDay || DefaultStartOfDay}`)
                     : info.start,
             };
 
@@ -241,6 +246,23 @@ export default function Calendar({
             setShowAddWorklogPopup(true);
         },
         [isGadget, $analytics, currentUser.startOfDay],
+    );
+
+    const handleDateClick = useCallback(
+        (date: Date, event: React.MouseEvent) => {
+            if (currentViewMode !== monthViewMode) {
+                return;
+            }
+
+            if ((event.target as Element).closest(monthCellDayNumberSelector)) {
+                apiRef.current?.gotoDate(date);
+                apiRef.current?.changeView('timeGridDay');
+                return;
+            }
+
+            handleEntryCreate({ start: date, end: addMinutes(date, defaultEntryDurationMinutes), allDay: true, view: monthViewMode });
+        },
+        [currentViewMode, handleEntryCreate],
     );
 
     const handleEntryClick = useCallback(
@@ -517,7 +539,7 @@ export default function Calendar({
                     selectable
                     creatable
                     nowIndicator
-                    navLinks
+                    navLinks={currentViewMode !== monthViewMode}
                     showNavigationPicker={!isGadget}
                     navigationPickerIconOnly
                     hideToolbar={useEmbeddedHeader}
@@ -535,6 +557,7 @@ export default function Calendar({
                     onEntryDrop={handleEntryDrop}
                     onEntryResize={handleEntryResize}
                     onEntryClick={handleEntryClick}
+                    onDateClick={handleDateClick}
                     onEntryContextMenu={handleEntryContextMenu}
                     onDateRangeChange={handleDateRangeChange}
                     onVisibleRangeChange={handleVisibleRangeChange}

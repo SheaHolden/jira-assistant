@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 import { useService } from '@/services/injector';
 
@@ -36,7 +36,7 @@ function getUpdatedAllDayEvents(date: Date, eventsList: CalendarEvent[], setting
         .filter((wl) => format(new Date(wl.dateStarted), 'yyyy-MM-dd') === dateKey);
 
     if (worklogs.length > 0 && settings.showInfo) {
-        const infoEvent = createInfoEvent(new Date(dateKey), worklogs, currentUser.maxHours, currentUser.minHours, settings);
+        const infoEvent = createInfoEvent(parseISO(dateKey), worklogs, currentUser.maxHours, currentUser.minHours, settings);
         result = [...result, infoEvent];
     }
 

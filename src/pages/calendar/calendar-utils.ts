@@ -153,6 +153,7 @@ export function createInfoEvent(date: Date, worklogs: Worklog[], maxHours: numbe
         start: startOfDay(date),
         end: endOfDay(date),
         allDay: true,
+        className: 'ja-daily-total',
         editable: false,
         resizable: false,
         entryType: 3,

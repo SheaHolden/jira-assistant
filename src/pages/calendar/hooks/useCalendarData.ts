@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
 
-import { endOfDay, startOfDay } from 'date-fns';
+import { endOfDay, parseISO, startOfDay } from 'date-fns';
 
 import { useService } from '@/services/injector';
 
@@ -79,7 +79,7 @@ export function useCalendarData(settings: CalendarSettings, currentUser: any) {
 
                 if (settings.showInfo) {
                     groupedWorklogs.forEach((wls, dateKey) => {
-                        const date = new Date(dateKey);
+                        const date = parseISO(dateKey);
                         const sourceWorklogs = wls.map((wl) => wl.sourceObject);
                         const infoEvent = createInfoEvent(date, sourceWorklogs, currentUser.maxHours, currentUser.minHours, settings);
                         infoEvents.push(infoEvent);
