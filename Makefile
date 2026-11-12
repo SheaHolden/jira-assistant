@@ -1,6 +1,11 @@
 PNPM ?= npx -y pnpm
+FIREFOX_DIR := dist/firefox
+XPI_DIR := dist/xpi
 
-.PHONY: dev install build-web build-extn build-extn-debug typecheck format clean
+-include .env.local
+export WEB_EXT_API_KEY WEB_EXT_API_SECRET
+
+.PHONY: dev install build-web build-extn build-extn-debug firefox typecheck format clean
 
 dev: node_modules
 	$(PNPM) start-web
@@ -17,6 +22,11 @@ build-web: node_modules
 
 build-extn: node_modules
 	$(PNPM) build
+
+# AMO rejects re-used versions, so each signed build gets a minutes-since-epoch fourth part.
+firefox: build-extn
+	node -e 'const f = "$(FIREFOX_DIR)/manifest.json", fs = require("fs"), m = JSON.parse(fs.readFileSync(f)); m.version = m.version.split(".").slice(0, 3).join(".") + "." + Math.floor(Date.now() / 60000); fs.writeFileSync(f, JSON.stringify(m, null, 4)); console.log("Signing version", m.version)'
+	npx -y web-ext sign --channel=unlisted --source-dir $(FIREFOX_DIR) --artifacts-dir $(XPI_DIR)
 
 build-extn-debug: node_modules
 	$(PNPM) build-debug

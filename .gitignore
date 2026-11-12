@@ -24,6 +24,7 @@ dist-ssr
 *.sw?
 pnpm-lock.yaml
 .env
+.env.local
 
 # AutoQAI workspace
 .autoqai/*
