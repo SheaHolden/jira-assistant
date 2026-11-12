@@ -3,11 +3,29 @@
 
 <head>
   <style>
+    :root {
+      color-scheme: light dark;
+      --menu-bg: #fff;
+      --menu-text: #000;
+      --menu-border: #ddd;
+      --menu-hover: #f5f5f5;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --menu-bg: #2b2a33;
+        --menu-text: #fbfbfe;
+        --menu-border: #4a4a55;
+        --menu-hover: #3a3944;
+      }
+    }
+
     body {
       margin: 0;
       font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
       font-size: 14px;
-      color: #333;
+      background-color: var(--menu-bg);
+      color: var(--menu-text);
     }
 
     ul {
@@ -18,19 +36,19 @@
     }
 
     ul li:not(:last-child) {
-      border-bottom: 1px solid #ddd;
+      border-bottom: 1px solid var(--menu-border);
     }
 
     li a {
       display: block;
-      color: #000;
+      color: var(--menu-text);
       padding: 8px 16px;
       text-decoration: none;
       cursor: pointer;
     }
 
     li a:hover {
-      background-color: #f5f5f5;
+      background-color: var(--menu-hover);
     }
   </style>
 </head>
