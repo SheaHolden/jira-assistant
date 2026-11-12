@@ -4,13 +4,10 @@ import type { ThemeState } from '@types';
 
 import { applyBodyTheme } from './apply-body-theme';
 
-export const useThemeStore = create<ThemeState>()((set, get) => ({
+export const useThemeStore = create<ThemeState>()((set) => ({
     theme: 'light',
     setTheme: (theme) => {
         set({ theme });
         applyBodyTheme(theme);
-    },
-    toggleTheme: () => {
-        get().setTheme(get().theme === 'light' ? 'dark' : 'light');
     },
 }));

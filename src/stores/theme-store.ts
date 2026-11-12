@@ -7,15 +7,11 @@ import { applyBodyTheme } from './apply-body-theme';
 
 export const useThemeStore = create<ThemeState>()(
     persist(
-        (set, get) => ({
+        (set) => ({
             theme: 'light',
             setTheme: (theme) => {
                 set({ theme });
                 applyBodyTheme(theme);
-            },
-            toggleTheme: () => {
-                const newTheme = get().theme === 'light' ? 'dark' : 'light';
-                get().setTheme(newTheme);
             },
         }),
         {

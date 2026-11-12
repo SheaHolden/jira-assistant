@@ -8,6 +8,7 @@ import { isWebBuild } from '@/constants/build-info';
 
 import App from './App.tsx';
 import './index.css';
+import './themes.css';
 
 const Router = isWebBuild ? BrowserRouter : HashRouter;
 

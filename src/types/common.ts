@@ -41,10 +41,11 @@ export interface RouteConfig {
 
 export type ThemeMode = 'light' | 'dark';
 
+export type ThemeId = ThemeMode | 'parchment' | 'aurora' | 'high-contrast';
+
 export interface ThemeState {
-    theme: ThemeMode;
-    setTheme: (theme: ThemeMode) => void;
-    toggleTheme: () => void;
+    theme: ThemeId;
+    setTheme: (theme: ThemeId) => void;
 }
 
 export interface ThemeConfig {

@@ -1,13 +1,14 @@
+import { getThemeMode } from '@/constants/themes';
 import { useThemeStore } from '@stores';
 
 export function useTheme() {
-    const { theme, setTheme, toggleTheme } = useThemeStore();
+    const { theme, setTheme } = useThemeStore();
+    const mode = getThemeMode(theme);
 
     return {
         theme,
         setTheme,
-        toggleTheme,
-        isDark: theme === 'dark',
-        isLight: theme === 'light',
+        isDark: mode === 'dark',
+        isLight: mode === 'light',
     };
 }
